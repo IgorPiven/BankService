@@ -3,6 +3,7 @@ package com.example.transactionsservice.services;
 import com.example.transactionsservice.enums.CurrencyName;
 import com.example.transactionsservice.exceptions.ResourceNotAvailableException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @Service
 @SuppressWarnings("unchecked")
+@Slf4j
 public class CurrencyService {
 
     @Value("${currencies.url}") private String currencyURL;
@@ -39,6 +41,11 @@ public class CurrencyService {
     }
 
     public EnumMap<CurrencyName, BigDecimal> getCurrencyValue() {
+
+        if (currenciesMap.isEmpty()) {
+            log.error("Data is empty. Recalling currency service");
+            getActualCurrencies();
+        }
 
         EnumMap<CurrencyName, BigDecimal> currenciesEnumMap = new EnumMap<>(CurrencyName.class);
 
