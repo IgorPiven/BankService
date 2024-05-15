@@ -4,7 +4,11 @@ import com.example.currencyservice.entities.CurrentRate;
 import com.example.currencyservice.model.Rates;
 import com.example.currencyservice.repositories.RateRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +29,7 @@ public class RatesService {
     @Value("${exchange.app_id}")
     String app_id;
 
+    @Cacheable("currencies")
     public CurrentRate getRates() {
 
         CurrentRate currentRate = rateRepository.findLastRate();
@@ -37,6 +42,7 @@ public class RatesService {
     }
 
     @Scheduled(cron = "${cron.expression}", zone = "Europe/Moscow")
+    @CacheEvict("currencies")
     public void saveRatesToDataBase() {
 
         CurrentRate currentRate = new CurrentRate();
