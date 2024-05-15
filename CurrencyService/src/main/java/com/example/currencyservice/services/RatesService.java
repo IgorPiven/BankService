@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import static com.example.currencyservice.model.CurrencyType.*;
 
@@ -25,6 +26,13 @@ public class RatesService {
     String app_id;
 
     public CurrentRate getRates() {
+
+        CurrentRate currentRate = rateRepository.findLastRate();
+
+        if (currentRate.getRateDate().isBefore(ZonedDateTime.now().toLocalDate())) {
+            saveRatesToDataBase();
+        }
+
         return rateRepository.findLastRate();
     }
 
